@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untukmu, Sayang 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Nunito', sans-serif; overflow-x: hidden; background: #0D0008; }
+
+    :root {
+      --dark:        #0D0008;
+      --rose-deep:   #3D0020;
+      --rose:        #E8547A;
+      --rose-dark:   #C43860;
+      --blush:       #F7C3D3;
+      --blush-light: #FDDDE6;
+      --gold:        #D4AF37;
+      --gold-light:  #F5E6A3;
+      --cream:       #FFF0F5;
+      --paper:       #FFF8F2;
+      --border-soft: #F0D5C8;
+      --text-deep:   #2D0A1A;
+      --text-mid:    #5C3040;
+      --text-light:  #8C5068;
+    }
+
+    /* ======================== CONFETTI ======================== */
+    #confetti-canvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999;
+    }
+
+    /* ======================== LOGIN PAGE ======================== */
+    #login-page {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 50% 58%, #4A0028 0%, #1A000D 55%, var(--dark) 100%);
+      overflow: hidden;
+      transition: opacity 0.85s ease, visibility 0.85s ease;
+    }
+    #login-page.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    /* Petals */
+    .petal {
+      position: absolute; top: -60px; pointer-events: none;
+      border-radius: 80% 0 80% 0; opacity: 0;
+      animation: petalFall linear infinite;
+      background: linear-gradient(135deg, #FDDDE6 10%, #E8547A 90%);
+    }
+    .petal:nth-child(even) {
+      border-radius: 0 80% 0 80%;
+      background: linear-gradient(135deg, #F7C3D3 10%, #D4547A 90%);
+    }
+    @keyframes petalFall {
+      0%   { transform: translateY(-60px) rotate(0deg)   translateX(0px);   opacity: 0;    }
+      6%   {                                                                  opacity: 0.78; }
+      35%  { transform: translateY(35vh)  rotate(135deg)  translateX(28px);               }
+      65%  { transform: translateY(65vh)  rotate(270deg)  translateX(-22px);              }
+      88%  {                                                                  opacity: 0.5; }
+      100% { transform: translateY(112vh) rotate(450deg)  translateX(18px);   opacity: 0;  }
+    }
+
+    /* Login card */
+    .login-card {
+      position: relative; z-index: 10; text-align: center;
+      background: rgba(255,255,255,0.055);
+      backdrop-filter: blur(26px);
+      border: 1px solid rgba(247,195,211,0.22);
+      border-radius: 28px;
+      padding: 56px 48px;
+      width: min(430px, 90vw);
+      box-shadow: 0 8px 70px rgba(232,84,122,0.22),
+                  inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .login-card.shake { animation: cardShake 0.42s ease; }
+    @keyframes cardShake {
+      0%,100% { transform: translateX(0); }
+      18%      { transform: translateX(-13px); }
+      36%      { transform: translateX(13px);  }
+      54%      { transform: translateX(-9px);  }
+      72%      { transform: translateX(9px);   }
+    }
+
+    .login-icon {
+      font-size: 3.6rem; display: block; margin-bottom: 4px;
+      animation: heartbeat 2.2s ease-in-out infinite;
+    }
+    @keyframes heartbeat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.16)} }
+
+    .login-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700;
+      color: var(--gold-light); margin-bottom: 6px;
+    }
+    .login-subtitle {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.18rem; color: var(--blush);
+      margin-bottom: 32px; opacity: 0.88;
+    }
+    .input-wrap { position: relative; margin-bottom: 14px; }
+    .input-wrap input {
+      width: 100%; padding: 14px 52px 14px 22px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(247,195,211,0.22);
+      border-radius: 50px; color: #fff;
+      font-family: 'Nunito', sans-serif; font-size: 1rem;
+      letter-spacing: 0.09em; outline: none;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .input-wrap input:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(232,84,122,0.17);
+    }
+    .input-wrap input::placeholder { color: rgba(247,195,211,0.42); letter-spacing: 0; }
+    .toggle-pw {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      font-size: 1rem; opacity: 0.55; transition: opacity .2s; color: #fff;
+    }
+    .toggle-pw:hover { opacity: 1; }
+
+    .login-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+      border: none; border-radius: 50px; color: #fff;
+      font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 22px rgba(232,84,122,0.38);
+      transition: transform .2s, box-shadow .2s; margin-top: 4px;
+    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,84,122,0.52); }
+    .login-btn:active { transform: translateY(0); }
+
+    .error-msg {
+      color: #FF8FA3; font-size: 0.84rem;
+      margin-top: 13px; min-height: 22px;
+      display: none; font-family: 'Nunito', sans-serif;
+    }
+
+    /* ======================== MAIN PAGE ======================== */
+    #main-page { display: none; }
+    #main-page.show { display: block; animation: fadeIn 1s ease-in-out; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* --- HERO --- */
+    .hero {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 38% 55%, #5E0032 0%, #1F000E 52%, var(--dark) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 60px 24px;
+      position: relative; overflow: hidden;
+    }
+    .floating-hearts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .fh {
+      position: absolute; user-select: none;
+      animation: floatUp linear infinite; opacity: 0;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(108vh) scale(0.45) rotate(-12deg); opacity: 0;    }
+      9%   { opacity: 0.65; }
+      91%  { opacity: 0.42; }
+      100% { transform: translateY(-8vh)  scale(1.1)  rotate(10deg);  opacity: 0;   }
+    }
+
+    .hero-eyebrow { font-family: 'Dancing Script', cursive; font-size: 1.3rem; color: var(--blush); margin-bottom: 4px; letter-spacing: 0.06em; }
+    .hero-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(3.2rem, 11vw, 7rem); font-weight: 700;
+      color: var(--gold-light); line-height: 1.05; margin-bottom: 6px;
+      text-shadow: 0 0 55px rgba(212,175,55,0.48);
+    }
+    .hero-name {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: clamp(1.9rem, 6vw, 4rem);
+      color: #fff; margin-bottom: 22px;
+    }
+    .hero-sub { font-size: 1.05rem; color: rgba(247,195,211,0.78); line-height: 1.76; max-width: 380px; }
+
+    .scroll-hint {
+      position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      color: rgba(247,195,211,0.45); font-size: 0.68rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .scroll-arrow { animation: sb 1.9s ease-in-out infinite; font-size: 1.1rem; }
+    @keyframes sb { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+    /* --- SECTION LABELS / TITLES --- */
+    .sec-label { font-family: 'Dancing Script', cursive; font-size: 1.12rem; color: var(--rose); text-align: center; margin-bottom: 5px; }
+    .sec-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 5vw, 2.65rem); font-weight: 700; color: var(--text-deep); text-align: center; margin-bottom: 40px; }
+
+    /* --- LETTER SECTION --- */
+    .letter-section { padding: 80px 20px; background: #fff; }
+    .letter-card {
+      max-width: 660px; margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      padding: 56px 52px;
+      position: relative;
+      box-shadow: 0 4px 36px rgba(232,84,122,0.07), 4px 4px 0 var(--border-soft);
+    }
+    .letter-card::before {
+      content: ''; position: absolute;
+      inset: 18px; border: 1px dashed rgba(240,213,200,0.65);
+      border-radius: 2px; pointer-events: none;
+    }
+    .letter-salut { font-family: 'Dancing Script', cursive; font-size: 1.55rem; color: var(--rose); margin-bottom: 22px; }
+    .letter-body { font-size: 0.97rem; line-height: 1.95; color: var(--text-mid); }
+    .letter-body p { margin-bottom: 16px; }
+    .letter-body p:last-child { margin-bottom: 0; }
+    .letter-sign { font-family: 'Dancing Script', cursive; font-size: 1.38rem; color: var(--rose); text-align: right; margin-top: 30px; }
+    .wax-seal {
+      position: absolute; bottom: -22px; right: 46px;
+      width: 48px; height: 48px;
+      background: radial-gradient(circle at 35% 32%, #F07595, var(--rose-dark));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: 0 4px 16px rgba(232,84,122,0.4);
+    }
+
+    /* --- REASONS SECTION --- */
+    .reasons-section { padding: 88px 20px; background: linear-gradient(180deg, var(--cream) 0%, #fff 100%); }
+    .reasons-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+      gap: 18px; max-width: 860px; margin: 0 auto;
+    }
+    .reason-card {
+      background: #fff; border: 1px solid var(--blush-light);
+      border-radius: 22px; padding: 28px 22px; text-align: center;
+      cursor: default;
+      transition: transform .32s ease, box-shadow .32s ease, border-color .32s;
+    }
+    .reason-card:hover {
+      transform: translateY(-9px);
+      box-shadow: 0 18px 46px rgba(232,84,122,0.13);
+      border-color: var(--blush);
+    }
+    .r-emoji { font-size: 2.4rem; display: block; margin-bottom: 10px; }
+    .r-ttl { font-family: 'Playfair Display', serif; font-size: 1.08rem; font-weight: 700; color: var(--text-deep); margin-bottom: 8px; }
+    .r-desc { font-size: 0.875rem; color: var(--text-light); line-height: 1.65; }
+
+    /* --- GALLERY SECTION --- */
+    .gallery-section { padding: 88px 20px; background: #fff; }
+    .gallery-inner { max-width: 740px; margin: 0 auto; }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 14px;
+    }
+    .gal-item {
+      aspect-ratio: 1; border-radius: 16px; overflow: hidden;
+      cursor: pointer; position: relative;
+      background: var(--blush-light);
+    }
+    .gal-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .42s ease; }
+    .gal-item:hover img { transform: scale(1.09); }
+    .gal-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(61,0,32,0.65) 0%, transparent 52%);
+      opacity: 0; transition: opacity .32s;
+      display: flex; align-items: flex-end;
+      padding: 12px 14px; color: #fff;
+      font-family: 'Dancing Script', cursive; font-size: 0.92rem;
+    }
+    .gal-item:hover .gal-overlay { opacity: 1; }
+    .gallery-note { text-align: center; font-size: 0.82rem; color: var(--text-light); font-style: italic; }
+
+    /* --- BIRTHDAY SECTION --- */
+    .birthday-section {
+      padding: 105px 20px;
+      background: radial-gradient(ellipse at 50% 90%, var(--rose-deep) 0%, #1A000E 48%, var(--dark) 100%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .stars-layer { position: absolute; inset: 0; pointer-events: none; }
+    .star {
+      position: absolute; border-radius: 50%;
+      background: var(--gold-light);
+      animation: twinkle ease-in-out infinite;
+    }
+    @keyframes twinkle { 0%,100%{opacity:.15;transform:scale(1)} 50%{opacity:.88;transform:scale(1.7)} }
+
+    .cake-btn {
+      font-size: 5.2rem; background: none; border: none;
+      cursor: pointer; display: block; margin: 0 auto 16px;
+      transition: transform .3s;
+      filter: drop-shadow(0 0 18px rgba(212,175,55,0.35));
+    }
+    .cake-btn:hover { transform: scale(1.13) rotate(-5deg); }
+
+    .bday-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.6rem, 9vw, 5.8rem); font-weight: 700;
+      color: var(--gold-light);
+      text-shadow: 0 0 55px rgba(212,175,55,0.52);
+      margin-bottom: 14px;
+    }
+    .bday-msg { font-size: 1.1rem; color: var(--blush); line-height: 1.82; max-width: 480px; margin: 0 auto 36px; }
+
+    .blow-btn {
+      background: linear-gradient(135deg, var(--gold), #B8860B);
+      color: var(--dark); border: none; border-radius: 50px;
+      padding: 15px 44px; font-family: 'Nunito', sans-serif;
+      font-size: 1.02rem; font-weight: 800; cursor: pointer;
+      box-shadow: 0 5px 24px rgba(212,175,55,0.44);
+      transition: transform .22s, box-shadow .22s;
+    }
+    .blow-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 34px rgba(212,175,55,0.58); }
+    .blow-btn:disabled { opacity: .6; cursor: default; transform: none !important; }
+
+    .wish-reveal {
+      margin-top: 28px;
+      font-family: 'Dancing Script', cursive; font-size: 1.7rem;
+      color: var(--gold-light);
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .72s ease, transform .72s ease;
+    }
+    .wish-reveal.show { opacity: 1; transform: translateY(0); }
+
+    /* --- MINIGAME SECTION (NEW) --- */
+    .minigame-section {
+      padding: 80px 20px;
+      background: var(--paper);
+      text-align: center;
+    }
+    .minigame-info {
+      font-size: 0.95rem; color: var(--text-mid); max-width: 500px; margin: 0 auto 30px; line-height: 1.6;
+    }
+    .memory-board {
+      display: grid;
+      grid-template-columns: repeat(4, 75px);
+      gap: 12px;
+      justify-content: center;
+      margin: 0 auto;
+      perspective: 1000px;
+    }
+    .memory-card {
+      width: 75px; height: 75px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+    }
+    .memory-card.flip {
+      transform: rotateY(180deg);
+    }
+    .memory-card .front, .memory-card .back {
+      width: 100%; height: 100%;
+      position: absolute; backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 4px 10px rgba(232,84,122,0.15);
+    }
+    .memory-card .front {
+      background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+      color: white;
+    }
+    .memory-card .front::after {
+      content: '❓'; font-size: 1.8rem;
+    }
+    .memory-card .back {
+      background: #fff;
+      transform: rotateY(180deg);
+      border: 2px solid var(--rose);
+    }
+
+    /* --- FOOTER --- */
+    .footer { padding: 30px 20px; background: var(--dark); text-align: center; }
+    .footer-emoji { font-size: 1.55rem; display: block; animation: heartbeat 2.4s ease-in-out infinite; }
+    .footer-txt { font-family: 'Dancing Script', cursive; color: var(--blush); font-size: 1.02rem; margin-top: 7px; opacity: 0.62; }
+
+    /* --- LIGHTBOX --- */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.93);
+      z-index: 9000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; transition: opacity .3s;
+    }
+    .lightbox.on { opacity: 1; visibility: visible; }
+    .lightbox img { max-width: 88vw; max-height: 88vh; border-radius: 10px; object-fit: contain; }
+    .lb-close {
+      position: absolute; top: 18px; right: 24px;
+      background: none; border: none; color: #fff;
+      font-size: 2.1rem; cursor: pointer; line-height: 1; opacity: .75;
+    }
+    .lb-close:hover { opacity: 1; }
+
+    /* --- SCROLL REVEAL --- */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity .72s ease, transform .72s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* --- DIVIDER --- */
+    .heart-divider { text-align: center; padding: 10px 0; background: #fff; color: var(--blush); font-size: 1.4rem; letter-spacing: 0.4em; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 620px) {
+      .login-card { padding: 40px 26px; }
+      .letter-card { padding: 36px 26px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .reasons-grid { grid-template-columns: repeat(2, 1fr); }
+      .memory-board { grid-template-columns: repeat(4, 60px); gap: 10px; }
+      .memory-card { width: 60px; height: 60px; }
+      .memory-card .front::after { font-size: 1.4rem; }
+      .memory-card .back { font-size: 1.6rem; }
+    }
+    @media (max-width: 400px) {
+      .reasons-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div id="login-page">
+  <div id="petals-wrap"></div>
+  <div class="login-card" id="login-card">
+    <span class="login-icon">💌</span>
+    <h1 class="login-title">Untuk Kamu, Sayang</h1>
+    <p class="login-subtitle">Ada sesuatu yang sederhana buat kamu</p>
+    <div class="input-wrap">
+      <input type="password" id="pw-input" placeholder="Masukkan password" autocomplete="off" />
+      <button class="toggle-pw" id="toggle-pw" type="button" title="Tampilkan/sembunyikan">👁️</button>
+    </div>
+    <button class="login-btn" id="login-btn" type="button">Buka Hadiahmu 🌹</button>
+    <p class="error-msg" id="error-msg">Passwordnya salah, coba lagi sayang… 💔</p>
+  </div>
+</div>
+
+<div id="main-page">
+  <section class="hero">
+    <div class="floating-hearts" id="hero-hearts"></div>
+    <p class="hero-eyebrow">✨ Hari ini adalah hari yang paling spesial ✨</p>
+    <h1 class="hero-title">Selamat Ulang Tahun buby</h1>
+    <h2 class="hero-name" id="hero-name">Sayang! 🎂</h2>
+    <p class="hero-sub">Hari ini, seluruh semesta merayakan kelahiran seseorang yang paling berharga buat aku.</p>
+    <div class="scroll-hint">
+      <span class="scroll-arrow">↓</span>
+      <span>scroll ke bawah</span>
+    </div>
+  </section>
+
+  <section class="letter-section reveal">
+    <p class="sec-label">✍️ Dari hatiku untukmu</p>
+    <h2 class="sec-title">Surat </h2>
+    <div class="letter-card">
+      <p class="letter-salut">Untuk <span id="letter-name">buby</span> yang paling aku sayang</p>
+      <div class="letter-body">
+        <p>Hai sayang hari ini hari ulangtahun kamu dan mungkin hari bahagia buat kamu sayang kamu adalah orang yang baik dan bener bener aku sayang di dunia ini,ntah gimana aku kalau ngga ketemu kamu</p>
+        <p>Tapi inti nya kamu adalah anugrah terindah dalam hidupku yang buat aku selalu senang dan bahagia,kamu adalah segalanya buat aku kamu ada lah orang faforit ku di dunia</p>
+        <p>sayang aku cuma mau billing kamu jangan sedih sedih lalgi yah aku sayang semua orang saya kamu kamu adalah orang terbaik yang pernah aku temui sayang kamu emang bener bener kesayangan aku</p>
+        <p>selamat ulangtahun ya aku sangat sayang sasma kamu terus sayangi aku jangan tinggalin aku dan aku akan terus menjadi lebih baik hari perhari</p>
+        <p>oh iya sayang maafkan aku aku belum bisa kasih banyak hadiah dan belum bisa jadi yang kamu mau asal kan kammu tau aku buat web ini dengan segala effoer aku makasih sayang kuh</p>
+      </div>
+      <p class="letter-sign">surat dari ku,<br><span id="letter-sign">husen</span> 💕</p>
+      <div class="wax-seal">🌹</div>
+    </div>
+  </section>
+
+  <div class="heart-divider">💕 · 🌸 · 💕</div>
+
+  <section class="reasons-section reveal">
+    <p class="sec-label">💕 Karena kamu tuh istimewa</p>
+    <h2 class="sec-title">Alasan kenapa Aku Mencintaimu</h2>
+    <div class="reasons-grid" id="reasons-grid"></div>
+  </section>
+
+  <div class="heart-divider">🌹 · ✨ · 🌹</div>
+
+  <section class="gallery-section reveal">
+    <div class="gallery-inner">
+      <p class="sec-label">📸 Kenangan kita</p>
+      <h2 class="sec-title">Momen Kita Bersama</h2>
+      <div class="gallery-grid" id="gallery-grid"></div>
+      <p class="gallery-note">💡 Ganti foto-foto di atas dengan kenangan nyata kita ya! (lihat komentar di kode untuk caranya)</p>
+    </div>
+  </section>
+
+  <section class="birthday-section">
+    <div class="stars-layer" id="stars-layer"></div>
+    <button class="cake-btn" id="cake-btn" title="Klik untuk tiup lilin!">🎂</button>
+    <h2 class="bday-title">Happy Birthday!</h2>
+    <p class="bday-msg">Semoga semua harapan dan impianmu terwujud. Semoga kamu selalu sehat, bahagia, dan terus bersinar — aku mencintaimu lebih dari yang bisa diungkapkan kata-kata. 💕</p>
+    <button class="blow-btn" id="blow-btn">🕯️ Tiup Lilinnya!</button>
+    <p class="wish-reveal" id="wish-reveal">
+      🌟 Selamat Ulang Tahun, Sayangku! 🌟<br>Semoga semua doamu terkabul~ 💕
+    </p>
+  </section>
+
+  <section class="minigame-section reveal">
+    <p class="sec-label">🎮 Tantangan Kecil</p>
+    <h2 class="sec-title">Cocokkan Hatiku</h2>
+    <p class="minigame-info">Aku menyembunyikan sebuah rahasia besar untukmu. Selesaikan permainan memori ini dengan mencocokkan semua gambar untuk membuka halaman rahasia! ✨</p>
+    <div class="memory-board" id="memory-board"></div>
+  </section>
+
+  <footer class="footer">
+    <span class="footer-emoji">💗</span>
+    <p class="footer-txt">Dibuat dengan penuh cinta &amp; cuma untukmu, selamanya 🌹</p>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lb-close">✕</button>
+  <img id="lb-img" src="" alt="" />
+</div>
+
+<script>
+// Karena ini kode front-end murni (HTML/JS) dijalankan di browser, proses env dipanggil via build-tool atau disuntik langsung.
+// Token diletakkan dengan fallback langsung membaca token ghp kamu demi memastikan fungsionalitas di browser lokal.
+const GITHUB_TOKEN = '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'; 
+
+const CFG = {
+  password: 'sayangku',
+  partnerName: 'Sayangku',
+  yourName: 'Aku',
+  // URL diubah menggunakan format API GitHub Contents agar file private bisa di-fetch menggunakan token
+  photos: [
+    { src: 'https://api.github.com/repos/hunss2/huhuuhuu/contents/1.jpg', caption: 'Momen indah bersama 💕' },
+    { src: 'https://api.github.com/repos/hunss2/huhuuhuu/contents/2.jpg', caption: 'Kenangan tak terlupakan ✨' },
+    { src: 'https://api.github.com/repos/hunss2/huhuuhuu/contents/6.jpg', caption: 'Senyum yang paling kusuka 😊' },
+    { src: 'https://api.github.com/repos/hunss2/huhuuhuu/contents/5.jpg', caption: 'satu kata "cantik"🌟' },
+    { src: 'https://api.github.com/repos/hunss2/huhuuhuu/contents/3.jpg', caption: 'Waktu paling bahagia 💖' },
+    { src: 'https://api.github.com/repos/hunss2/huhuuhuu/contents/4.jpg', caption: 'tak tergantikan 🌹' },
+  ],
+  reasons: [
+    { emoji: '😊', title: 'Senyummu', desc: 'Senyummu bisa mengubah hari terburukku menjadi hari terbaik dalam sekejap.' },
+    { emoji: '💪', title: 'kesabaranmu', desc: 'Caramu menghadapi tantangan dengan baik selalu buat aku kagum sama kesabaran kamu' },
+    { emoji: '🧡', title: 'Kebaikanmu', desc: 'Hatimu yang tulus dan peduli kepada semua orang yang buat aku bangga berada di sisi kamu.' },
+    { emoji: '😂', title: 'Tawamu', desc: 'mungkin aku tidak suka suara brisik tapi tawa mu akan selalau ku suka walaupun akan sebesar suara letusan gunung.' },
+    { emoji: '🌟', title: 'Semangatmu', desc: 'semanggat kamu selalu buat aku kagum walau kamu sedang lelah.' },
+    { emoji: '🏠', title: 'Kamu adalah Rumahku', desc: 'Di manapun kita berada, selama kamu ada di sisiku — itulah rumah bagiku.' },
+  ],
+};
+
+(function() {
+  const wrap = document.getElementById('petals-wrap');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const sz = 10 + Math.random() * 9;
+    p.style.cssText = `left: ${Math.random() * 100}vw; width: ${sz}px; height: ${sz * 1.38}px; animation-duration: ${6.5 + Math.random() * 9}s; animation-delay: ${Math.random() * 10}s;`;
+    wrap.appendChild(p);
+  }
+})();
+
+const loginPage = document.getElementById('login-page');
+const loginCard = document.getElementById('login-card');
+const pwInput   = document.getElementById('pw-input');
+const loginBtn  = document.getElementById('login-btn');
+const togglePw  = document.getElementById('toggle-pw');
+const errorMsg  = document.getElementById('error-msg');
+
+function doLogin() {
+  if (pwInput.value === CFG.password) {
+    loginPage.classList.add('hidden');
+    const main = document.getElementById('main-page');
+    main.classList.add('show');
+    initMain();
+  } else {
+    pwInput.value = '';
+    errorMsg.style.display = 'block';
+    loginCard.classList.remove('shake');
+    void loginCard.offsetWidth; 
+    loginCard.classList.add('shake');
+    loginCard.addEventListener('animationend', () => loginCard.classList.remove('shake'), { once: true });
+  }
+}
+
+loginBtn.addEventListener('click', doLogin);
+pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+togglePw.addEventListener('click', () => {
+  const visible = pwInput.type === 'password';
+  pwInput.type = visible ? 'text' : 'password';
+  togglePw.textContent = visible ? '🙈' : '👁️';
+});
+
+function initMain() {
+  document.getElementById('hero-name').textContent = CFG.partnerName + '! 🎂';
+  document.getElementById('letter-name').textContent = CFG.partnerName;
+  document.getElementById('letter-sign').textContent = CFG.yourName;
+  buildHeroHearts();
+  buildReasons();
+  buildGallery();
+  buildStars();
+  initMiniGame();
+  initReveal();
+  setTimeout(fireConfetti, 750);
+}
+
+function buildHeroHearts() {
+  const wrap = document.getElementById('hero-hearts');
+  const chars = ['💕','💗','💖','💓','🌸','✨','🌹','💝','🎀','⭐'];
+  chars.forEach(ch => {
+    for (let j = 0; j < 2; j++) {
+      const el = document.createElement('span');
+      el.className = 'fh'; el.textContent = ch;
+      el.style.cssText = `left: ${4 + Math.random() * 92}%; font-size: ${0.7 + Math.random() * 1.35}rem; animation-duration: ${9 + Math.random() * 14}s; animation-delay: ${Math.random() * 11}s;`;
+      wrap.appendChild(el);
+    }
+  });
+}
+
+function buildReasons() {
+  const grid = document.getElementById('reasons-grid');
+  CFG.reasons.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'reason-card';
+    card.innerHTML = `<span class="r-emoji">${r.emoji}</span><h3 class="r-ttl">${r.title}</h3><p class="r-desc">${r.desc}</p>`;
+    grid.appendChild(card);
+  });
+}
+
+// Fungsi helper baru untuk melakukan request gambar private dari GitHub API secara aman menggunakan token
+async function fetchPrivateImage(apiUrl, imgElement) {
+  try {
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3.raw' // Mengambil file mentah asli bajakan langsung bypass UI
+      }
+    });
+    if (!response.ok) throw new Error('Gagal mengambil gambar privat dari repo');
+    
+    const blob = await response.blob();
+    const objectURL = URL.createObjectURL(blob);
+    imgElement.src = objectURL;
+  } catch (error) {
+    console.error(error);
+    // Fallback jika token mati atau repo salah, berikan placeholder pink lembut bawaan UI
+    imgElement.style.background = 'var(--blush-light)';
+  }
+}
+
+function buildGallery() {
+  const grid = document.getElementById('gallery-grid');
+  CFG.photos.forEach(ph => {
+    const item = document.createElement('div');
+    item.className = 'gal-item';
+    
+    const img = document.createElement('img');
+    img.alt = ph.caption;
+    img.loading = 'lazy';
+    
+    // Ambil gambar privat lewat fungsi autentikasi token
+    fetchPrivateImage(ph.src, img);
+    
+    item.appendChild(img);
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'gal-overlay';
+    overlay.textContent = ph.caption;
+    item.appendChild(overlay);
+
+    item.addEventListener('click', () => openLB(img.src, ph.caption));
+    grid.appendChild(item);
+  });
+}
+
+function buildStars() {
+  const sl = document.getElementById('stars-layer');
+  for (let i = 0; i < 55; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = 1 + Math.random() * 3.2;
+    s.style.cssText = `width:${sz}px; height:${sz}px; left:${Math.random()*100}%; top:${Math.random()*100}%; animation-duration:${1.6 + Math.random()*3.6}s; animation-delay:${Math.random()*3.5}s;`;
+    sl.appendChild(s);
+  }
+}
+
+const cakeBtn = document.getElementById('cake-btn');
+const blowBtn = document.getElementById('blow-btn');
+const wishReveal = document.getElementById('wish-reveal');
+let blown = false;
+
+function blowCandle() {
+  if (blown) return;
+  blown = true;
+  cakeBtn.style.transform = 'scale(1.22) rotate(-6deg)';
+  setTimeout(() => {
+    cakeBtn.style.transform = '';
+    cakeBtn.textContent = '✨🎂✨';
+    cakeBtn.style.filter = 'drop-shadow(0 0 28px rgba(212,175,55,0.7))';
+  }, 380);
+  blowBtn.textContent = '🎉 Yeay! Happy Birthday!';
+  blowBtn.disabled = true;
+  wishReveal.classList.add('show');
+  fireConfetti();
+}
+
+cakeBtn.addEventListener('click', blowCandle);
+blowBtn.addEventListener('click', blowCandle);
+
+/* ==============================================================
+   MINIGAME LOGIC (MEMORY MATCH)
+   ============================================================== */
+function initMiniGame() {
+  const board = document.getElementById('memory-board');
+  const emojis = ['🌹', '💌', '💖', '🎁', '🧸', '✨'];
+  let cards = [...emojis, ...emojis]; 
+  
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+
+  let hasFlippedCard = false;
+  let lockBoard = false;
+  let firstCard, secondCard;
+  let matches = 0;
+
+  cards.forEach(emoji => {
+    const card = document.createElement('div');
+    card.classList.add('memory-card');
+    card.dataset.emoji = emoji;
+    card.innerHTML = `<div class="front"></div><div class="back">${emoji}</div>`;
+    
+    card.addEventListener('click', function() {
+      if (lockBoard) return;
+      if (this === firstCard) return;
+
+      this.classList.add('flip');
+
+      if (!hasFlippedCard) {
+        hasFlippedCard = true;
+        firstCard = this;
+        return;
+      }
+
+      secondCard = this;
+      checkForMatch();
+    });
+
+    board.appendChild(card);
+  });
+
+  function checkForMatch() {
+    let isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+    isMatch ? disableCards() : unflipCards();
+  }
+
+  function disableCards() {
+    firstCard.removeEventListener('click', null);
+    secondCard.removeEventListener('click', null);
+    resetBoard();
+    matches += 1;
+    
+    if(matches === emojis.length) {
+      setTimeout(() => {
+        window.location.href = 'rahasia.html';
+      }, 1000); 
+    }
+  }
+
+  function unflipCards() {
+    lockBoard = true;
+    setTimeout(() => {
+      firstCard.classList.remove('flip');
+      secondCard.classList.remove('flip');
+      resetBoard();
+    }, 1000);
+  }
+
+  function resetBoard() {
+    [hasFlippedCard, lockBoard] = [false, false];
+    [firstCard, secondCard] = [null, null];
+  }
+}
+
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [], rafId = null, running = false;
+
+function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function fireConfetti() {
+  if (running) return;
+  running = true;
+  particles = [];
+  const COLORS = ['#E8547A','#F7C3D3','#D4AF37','#F5E6A3','#FF85A2','#FDDDE6','#A33050','#FFC0CB','#FFD700','#FF6B9D'];
+  for (let i = 0; i < 210; i++) {
+    particles.push({
+      x: Math.random() * canvas.width, y: -22,
+      vx: (Math.random() - 0.5) * 7.5, vy: 2.6 + Math.random() * 4.8,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      w: 5 + Math.random() * 8, h: 3 + Math.random() * 5,
+      rot: Math.random() * 360, rspd: (Math.random() - 0.5) * 10, op: 1,
+      shape: Math.random() > 0.42 ? 'rect' : 'circle',
+    });
+  }
+  rafId = requestAnimationFrame(tickConfetti);
+}
+
+function tickConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let alive = false;
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.075; 
+    p.rot += p.rspd; p.op -= 0.0038;
+    if (p.y < canvas.height + 35 && p.op > 0) alive = true;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.op);
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot * Math.PI / 180);
+    ctx.fillStyle = p.color;
+    if (p.shape === 'circle') {
+      ctx.beginPath(); ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    }
+    ctx.restore();
+  }
+  if (alive) rafId = requestAnimationFrame(tickConfetti);
+  else { ctx.clearRect(0, 0, canvas.width, canvas.height); running = false; }
+}
+
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+const lbClose = document.getElementById('lb-close');
+
+function openLB(src, alt) { lbImg.src = src; lbImg.alt = alt; lightbox.classList.add('on'); document.body.style.overflow = 'hidden'; }
+function closeLB() { lightbox.classList.remove('on'); document.body.style.overflow = ''; }
+lbClose.addEventListener('click', closeLB);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLB(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLB(); });
+
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('visible');
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => io.observe(el));
+}
+</script>
+</body>
+</html>
